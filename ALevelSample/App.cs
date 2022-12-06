@@ -19,12 +19,12 @@ public class App
 
     public async Task Start()
     {
-        var user = await _userService.GetUserById(23);
-        var userInfo = await _userService.CreateUser("morpheus", "leader");
-        var pageOfUsers = await _userService.GetListOfUsersById(23);
-        var resultWithDelay = await _userService.GetListOfUsersByIdWithDelay(2, 5);
+        var user = await _userService.GetUserById(2);
 
-        var resource = await _resourceService.GetResourceById(2);
+        var userInfo = await _userService.CreateUser("morpheus", "leader");
+        var pageOfUsers = await _userService.GetListOfUsersById(2, 10);
+
+        var resource = await _resourceService.GetResourceById(3);
         var resourcePage = await _resourceService.GetResourcePage();
 
         var userPut = await _userService.PutUser(2, "morpheus", "zion resident");

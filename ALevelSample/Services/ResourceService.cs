@@ -15,7 +15,11 @@ namespace ALevelSample.Services
         private readonly IInternalHttpClientService _httpClientService;
         private readonly ILogger<ResourceService> _logger;
         private readonly ApiOption _options;
-        private readonly string _sharedResourceApi = "api/unknown/";
+        private readonly string _resourceApi = "api/unknown/";
+        private readonly string _pageResourceApi = "api/unknown";
+        private readonly string _pageDelay = "delay=";
+        private readonly string _paramsMark = "?";
+
         public ResourceService(
             IInternalHttpClientService httpClientService,
             ILogger<ResourceService> logger,
@@ -26,9 +30,9 @@ namespace ALevelSample.Services
             _options = options.Value;
         }
 
-        public async Task<ResourceDto> GetResourceById(int id)
+        public async Task<ResourceDto> GetResourceById(int id, int delay = 0)
         {
-            var result = await _httpClientService.SendAsync<BaseResponse<ResourceDto>, object>($"{_options.Host}{_sharedResourceApi}{id}", HttpMethod.Get);
+            var result = await _httpClientService.SendAsync<BaseResponse<ResourceDto>, object>($"{_options.Host}{_resourceApi}{id}{_paramsMark}{_pageDelay}{delay}", HttpMethod.Get);
 
             if (result?.Data != null)
             {
@@ -38,9 +42,9 @@ namespace ALevelSample.Services
             return result?.Data;
         }
 
-        public async Task<IReadOnlyList<ResourceDto>> GetResourcePage()
+        public async Task<IReadOnlyList<ResourceDto>> GetResourcePage(int delay = 0)
         {
-            var result = await _httpClientService.SendAsync<BaseListResponse<ResourceDto>, object>($"{_options.Host}{_sharedResourceApi}", HttpMethod.Get);
+            var result = await _httpClientService.SendAsync<BaseListResponse<ResourceDto>, object>($"{_options.Host}{_pageResourceApi}{_paramsMark}{_pageDelay}{delay}", HttpMethod.Get);
 
             if (result?.Data != null)
             {
