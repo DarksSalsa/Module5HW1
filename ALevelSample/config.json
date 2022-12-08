@@ -1,5 +1,12 @@
 {
   "Api": {
     "Host": "https://reqres.in/"
+  },
+
+  "Pathing": {
+    "PageDelay": "delay=",
+    "ParamsStartMark": "?",
+    "ParamsAndMark": "&",
+    "PageNumber":  "page="
   }
 }

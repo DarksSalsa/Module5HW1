@@ -16,25 +16,26 @@ public class UserService : IUserService
     private readonly IInternalHttpClientService _httpClientService;
     private readonly ILogger<UserService> _logger;
     private readonly ApiOption _options;
-    private readonly string _userApi = "api/users/";
-    private readonly string _pageDelay = "delay=";
-    private readonly string _paramsMark = "?";
-    private readonly string _andMark = "&";
-    private readonly string _userListApi = $"api/users?page=";
+    private readonly PathingOption _pathingOptions;
+    private readonly string _userApi = "api/users";
 
     public UserService(
         IInternalHttpClientService httpClientService,
         IOptions<ApiOption> options,
+        IOptions<PathingOption> pathingOptions,
         ILogger<UserService> logger)
     {
         _httpClientService = httpClientService;
         _logger = logger;
         _options = options.Value;
+        _pathingOptions = pathingOptions.Value;
     }
 
     public async Task<UserDto> GetUserById(int id, int delay = 0)
     {
-        var result = await _httpClientService.SendAsync<BaseResponse<UserDto>, object>($"{_options.Host}{_userApi}{id}{_paramsMark}{_pageDelay}{delay}", HttpMethod.Get);
+        var result = await _httpClientService.SendAsync<BaseResponse<UserDto>, object>(
+            $"{_options.Host}{_userApi}/{id}{_pathingOptions.ParamsStartMark}{_pathingOptions.PageDelay}{delay}",
+            HttpMethod.Get);
 
         if (result?.Data != null)
         {
@@ -44,10 +45,10 @@ public class UserService : IUserService
         return result?.Data;
     }
 
-    public async Task<IReadOnlyList<UserDto>> GetListOfUsersById(int pageId = 1, int delay = 0)
+    public async Task<BaseListResponse<UserDto>> GetListOfUsersById(int pageId = 1, int delay = 0)
     {
         var result = await _httpClientService.SendAsync<BaseListResponse<UserDto>, object>(
-            $"{_options.Host}{_userListApi}{pageId}{_andMark}{_pageDelay}{delay}",
+            $"{_options.Host}{_userApi}{_pathingOptions.ParamsStartMark}{_pathingOptions.PageNumber}{pageId}{_pathingOptions.ParamsAndMark}{_pathingOptions.PageDelay}{delay}",
             HttpMethod.Get);
 
         if (result?.Data != null)
@@ -56,13 +57,13 @@ public class UserService : IUserService
             _logger.LogInformation($"Vital information above data: {result.Page}, {result.PerPage}, {result.Total}, {result.TotalPages}");
         }
 
-        return result?.Data;
+        return result;
     }
 
     public async Task<UserResponse> CreateUser(string name, string job, int delay = 0)
     {
         var result = await _httpClientService.SendAsync<UserResponse, UserRequest>(
-            $"{_options.Host}{_userApi}{_paramsMark}{_pageDelay}{delay}",
+            $"{_options.Host}{_userApi}{_pathingOptions.ParamsStartMark}{_pathingOptions.PageDelay}{delay}",
             HttpMethod.Post,
             new UserRequest()
             {
@@ -81,7 +82,7 @@ public class UserService : IUserService
     public async Task<UserUpdateAndPatchResponse> PutUser(int id, string name, string job, int delay = 0)
     {
         var result = await _httpClientService.SendAsync<UserUpdateAndPatchResponse, UserRequest>(
-            $"{_options.Host}{_userApi}{id}{_paramsMark}{_pageDelay}{delay}",
+            $"{_options.Host}{_userApi}/{id}{_pathingOptions.ParamsStartMark}{_pathingOptions.PageDelay}{delay}",
             HttpMethod.Put,
             new UserRequest()
             {
@@ -101,7 +102,7 @@ public class UserService : IUserService
     public async Task<UserUpdateAndPatchResponse> PatchUser(int id, string name, string job, int delay = 0)
     {
         var result = await _httpClientService.SendAsync<UserUpdateAndPatchResponse, UserRequest>(
-            $"{_options.Host}{_userApi}{id}{_paramsMark}{_pageDelay}{delay}",
+            $"{_options.Host}{_userApi}/{id}{_pathingOptions.ParamsStartMark}{_pathingOptions.PageDelay}{delay}",
             HttpMethod.Put,
             new UserRequest()
             {
@@ -120,7 +121,9 @@ public class UserService : IUserService
 
     public async Task DeleteUser(int id, int delay = 0)
     {
-        await _httpClientService.SendAsync<object, object>($"{_options.Host}{_userApi}{id}{_paramsMark}{_pageDelay}{delay}", HttpMethod.Delete);
+        await _httpClientService.SendAsync<object, object>(
+            $"{_options.Host}{_userApi}/{id}{_pathingOptions.ParamsStartMark}{_pathingOptions.PageDelay}{delay}",
+            HttpMethod.Delete);
         _logger.LogInformation($"User with id = {id} was deleted");
     }
 }

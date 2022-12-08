@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 void ConfigureServices(ServiceCollection serviceCollection, IConfiguration configuration)
 {
     serviceCollection.AddOptions<ApiOption>().Bind(configuration.GetSection("Api"));
+    serviceCollection.AddOptions<PathingOption>().Bind(configuration.GetSection("Pathing"));
     serviceCollection
         .AddLogging(configure => configure.AddConsole())
         .AddHttpClient()
